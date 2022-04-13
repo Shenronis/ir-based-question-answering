@@ -1,10 +1,24 @@
-from utils.google_api import GoogleSearch
-google = GoogleSearch()
+from question_answering import IRQuestionAnswering
+from utils.functions import *
 
 if __name__ == "__main__":    
-    query = 'ai là người giàu nhất Việt Nam'
-        
-    data = google.search(query)
+    questionAnswering = IRQuestionAnswering()
 
-    for topic in data:
-        print(topic)
+    query = 'người giàu nhất thế giới hiện nay 2022'
+    answer_type = "PER"
+
+    data = questionAnswering.search(query, answer_type)
+
+    candidates = [p['ner'] for p in data]
+    candidates = list(set([j for i in candidates for j in i]))
+    candidates = [(c,0) for c in candidates]
+    candidates = dict(candidates)
+    for p in data:
+        for ner in p['ner']:
+            candidates[ner] += p['score']
+    candidates = candidates.items()
+    candidates = sorted(candidates, key = lambda x: x[1],reverse = True)
+    candidates = candidates[:10]
+    total_score = float(sum([c[1] for c in candidates[:5]]))
+    for c in candidates:
+        print(c[0], round((c[1] / total_score) * 100,2), "%")
