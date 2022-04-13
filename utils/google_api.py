@@ -77,7 +77,7 @@ class GoogleSearch():
                 sents = ' . '.join(sents)
                 paragraphs[i] = sents
 
-            return '\n\n'.join(paragraphs)
+            return paragraphs
         except:
             return ''
     
@@ -96,10 +96,11 @@ class GoogleSearch():
             title = topic['title']
             link = topic['link']
             content = self.__getContent(topic['link'])
+
             result.append({
                 'title': title,
                 'link': link,
                 'content': [d for d in content if len(d) > 20]
-            })
+            })            
 
         return result
