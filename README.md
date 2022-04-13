@@ -16,7 +16,8 @@
 
 # System Architecture
 - IR-Based Question Answering
-- Use Google Custom Search API for Question Processing phase
-- Neural Answer Extraction (BERT)
+- Use Google Custom Search API to get Documents
+- Use [underthesea](https://github.com/undertheseanlp/underthesea) for NLP tasks (NER, word_tokenize, sent_tokenize)
 
-![alt text]("Image Placeholder")
+
+![alt text](https://github.com/Shenronis/ir-based-question-answering/blob/main/architecture.png)
