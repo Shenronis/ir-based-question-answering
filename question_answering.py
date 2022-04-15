@@ -1,12 +1,10 @@
 import requests
-import re
-import sys
 from difflib import SequenceMatcher
 from bs4 import BeautifulSoup
 from underthesea import sent_tokenize
 from utils.functions import *
 
-API_KEY = ['AIzaSyBh7Kw9G3CH12L3KNe7d4eHkLfW9TJ8Yt0']
+API_KEY = ['AIzaSyAvk4ACFTv-I6lWZ0vnN-sjXBoDazphanY']
 SEARCH_ENGINE_ID = "7dc162fa0b147c47c"
 
 class IRQuestionAnswering():
@@ -19,6 +17,12 @@ class IRQuestionAnswering():
             IRQuestionAnswering.__instance = self
 
     def __googleSearch(self, query):
+        """
+            Wise man once said "Khong biet thi hoi Gooogle"
+
+            Use GoogleCustomSearch API to query 
+            and return result package as JSON
+        """
         print('Google Search...')
 
         page = 1
@@ -29,6 +33,9 @@ class IRQuestionAnswering():
         return data
 
     def __extractResult(self, result):
+        """
+            Extract information results from previous request's JSON
+        """
         print("Extracting Result...")
 
 
@@ -36,14 +43,18 @@ class IRQuestionAnswering():
         searched_items = result.get("items")        
         for i, search_item in enumerate(searched_items, start=1):            
             items.append({
-                'title': search_item.get("title"),
+                #'title': search_item.get("title"),
                 'link': search_item.get("link")                
             })
 
         return items
 
-    def __passageRetrievial(self, url):
-        print('Passage Retrievial...')
+    def __passageRetrieval(self, url):
+        """
+            Get website's document text
+            from getting <p> content from HTML tree
+        """
+        print('Passage Retrieval...')
 
 
         try:
@@ -51,6 +62,7 @@ class IRQuestionAnswering():
 
             html = requests.get(url, timeout=4)
             tree = BeautifulSoup(html.text,'lxml')
+            
             for invisible_elem in tree.find_all(['script', 'style']):
                 invisible_elem.extract()            
 
@@ -58,11 +70,16 @@ class IRQuestionAnswering():
             text_chunks = list(chunks(tree.get_text(),100000))
             for text in text_chunks:
                 content += tokenize(text)           
+
             return content
         except:
-            return ''
+           return ''
     
     def __processPassage(self, passages, topic_index):
+        """
+            Process passages, fiter out noisy sentences,
+            keep records like keywords, ner, topic ranks
+        """
         print('Process Passage...')
 
 
@@ -86,6 +103,10 @@ class IRQuestionAnswering():
         return res
 
     def __filterByKeywordOccurence(self, passages_dict):
+        """
+            Filter out passages by comparing each keyword occurence
+            in each passage with the highest count of keyword occurence overall
+        """
         print('Filtering...')
 
 
@@ -111,6 +132,14 @@ class IRQuestionAnswering():
         return [p for p in passages_dict if p['keyword'] >= max_keyword]
 
     def __rankPassages(self, passages_dict):
+        """
+            Feature-based Answer Extraction
+                - number of named entities
+                - number of keywords
+                - length of longest exact sequence of question keywords
+                - rank of own document (search result index)
+                - ngram overlap question
+        """
         print('Ranking...')
 
 
@@ -133,20 +162,38 @@ class IRQuestionAnswering():
 
         return passages_dict
 
-    def search(self, query, answer_type):        
+    def search(self, query, answer_type):
+        """
+            Return possible answers from query
+            using IR-based factoid QA system
+        """      
+
+        # keep records
         self.query = query        
         self.answer_type = answer_type
+
+        # get input keywords
         self.keywords = extractKeywords(query)
+
+        # search on webs
         searchResult = self.__googleSearch(query)
+
+        # get website's information (document retrieval)
         extractedResult = self.__extractResult(searchResult)
         
         result = []
 
         for topic_index, topic in enumerate(extractedResult):
-            title = topic['title']
+            #title = topic['title']
             link = topic['link']
-            passages = self.__passageRetrievial(link)
+
+            # passage retrieval, get website's body <p> content
+            passages = self.__passageRetrieval(link)
+
+            # filter data
             processed_passages = self.__filterByKeywordOccurence( self.__processPassage(passages, topic_index) )
+
+            # feature-based ranking (answer extraction)
             result += self.__rankPassages(processed_passages)             
 
         return result

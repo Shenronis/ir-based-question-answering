@@ -1,7 +1,6 @@
-pytorch-pretrained-bert==0.4.0
-underthesea==1.1.16
+lxml
 beautifulsoup4
+requests
+underthesea==1.1.16
 google-api-python-client==1.7.11
 nltk
-uuid
-tqdm
