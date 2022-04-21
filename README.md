@@ -1,4 +1,4 @@
-# IR-Based Factoid Question Answering with BERT
+# IR-Based Factoid Question Answering
 > University of Science - VNUHCM  
 > Natural Language Processing and Application - 19CNTT1
 
@@ -14,6 +14,12 @@
   - rank of own document
   - ngram overlap question
 
+
+# Install dependencies
+- See requirements.txt
+- To install, run `pip3 install -r requirements.txt`
+
+
 # System Architecture
 - IR-Based Question Answering
 - Use Google Custom Search API to get Documents
@@ -21,3 +27,8 @@
 
 
 ![alt text](https://github.com/Shenronis/ir-based-question-answering/blob/main/architecture.png)
+
+
+# How to use
+- Replace IDs correspondingly to yours in `question_answering.py`
+- Change question and answer type in `main.py` and then execute

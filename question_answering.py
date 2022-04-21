@@ -4,8 +4,12 @@ from bs4 import BeautifulSoup
 from underthesea import sent_tokenize
 from utils.functions import *
 
+
+## CHANGE THESE! ##
 API_KEY = ['AIzaSyAvk4ACFTv-I6lWZ0vnN-sjXBoDazphanY']
 SEARCH_ENGINE_ID = "7dc162fa0b147c47c"
+## CHANGE THESE! ##
+
 
 class IRQuestionAnswering():
     __instance = None
